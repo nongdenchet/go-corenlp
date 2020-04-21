@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	"github.com/hironobu-s/go-corenlp/connector"
-	"github.com/hironobu-s/go-corenlp/document"
+	"github.com/nongdenchet/go-corenlp/connector"
+	"github.com/nongdenchet/go-corenlp/document"
 )
 
 // Annotate annotate the text using a connector provided.

@@ -7,7 +7,7 @@
 Download and install it:
 
 ```shell
-go get github.com/hironobu-s/go-corenlp
+go get github.com/nongdenchet/go-corenlp
 ```
 
 Make sure that you can run Stanford CoreNLP on [command line](https://stanfordnlp.github.io/CoreNLP/cmdline.html):
@@ -26,8 +26,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/hironobu-s/go-corenlp" // exposes "corenlp"
-	"github.com/hironobu-s/go-corenlp/connector"
+	"github.com/nongdenchet/go-corenlp" // exposes "corenlp"
+	"github.com/nongdenchet/go-corenlp/connector"
 )
 
 func main() {
