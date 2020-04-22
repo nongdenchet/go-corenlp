@@ -1,12 +1,45 @@
 package corenlp
 
 import (
-	"log"
+	"fmt"
 	"os"
 	"testing"
 
 	"github.com/nongdenchet/go-corenlp/connector"
 )
+
+func TestCoreNLP(t *testing.T) {
+	// sample text from https://stanfordnlp.github.io/CoreNLP/
+	text := `President Xi Jinping of Chaina, on his first state visit to the United States, showed off his familiarity with American history and pop culture on Tuesday night.`
+
+	// LocalExec connector is responsible to run Stanford CoreNLP process.
+	c := connector.NewLocalExec(nil)
+	c.JavaArgs = []string{"-Xmx4g"}     // set Java params
+	c.ClassPath = os.Getenv("CORE_NLP") // set Java class path
+	c.Annotators = []string{"tokenize", "ssplit", "pos", "lemma", "ner"}
+
+	// Annotate text
+	doc, err := Annotate(c, text)
+	if err != nil {
+		panic(err)
+	}
+
+	// Output words and pos
+	fmt.Println("----- Tokens -----")
+	for _, sentence := range doc.Sentences {
+		for _, token := range sentence.Tokens {
+			fmt.Printf("%s(%s)%s\n", token.Word, token.Pos, token.After)
+		}
+	}
+
+	// Output entity mentions
+	fmt.Println("\n----- Entity Mentions -----")
+	for _, sentence := range doc.Sentences {
+		for _, token := range sentence.EntityMentions {
+			fmt.Printf("%s - %s\n", token.Text, token.Ner)
+		}
+	}
+}
 
 func TestEntityMention(t *testing.T) {
 	c := connector.NewLocalExec(nil)
@@ -14,9 +47,9 @@ func TestEntityMention(t *testing.T) {
 	c.JavaArgs = []string{"-Xmx8g"}
 	c.Annotators = []string{"tokenize", "ssplit", "pos", "lemma", "ner"}
 
-	doc, err := Annotate(c, "Rich Lesser is CEO of Boston Consulting Group")
+	doc, err := Annotate(c, `Rich Lesser is CEO of Boston Consulting Group`)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	entityMentions := doc.Sentences[0].EntityMentions
 

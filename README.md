@@ -36,19 +36,29 @@ func main() {
 
 	// LocalExec connector is responsible to run Stanford CoreNLP process.
 	c := connector.NewLocalExec(nil)
-	c.ClassPath = "./corenlp/*" // set Java class path
-	c.Annotators = []string{"tokenize", "ssplit", "pos"}
+	c.JavaArgs = []string{"-Xmx4g"} // set Java params
+	c.ClassPath = os.Getenv("CORE_NLP") // set Java class path
+	c.Annotators = []string{"tokenize", "ssplit", "pos", "lemma", "ner"}
 
 	// Annotate text
-	doc, err := corenlp.Annotate(c, text)
+	doc, err := Annotate(c, text)
 	if err != nil {
 		panic(err)
 	}
 
 	// Output words and pos
+	fmt.Println("----- Tokens -----")
 	for _, sentence := range doc.Sentences {
 		for _, token := range sentence.Tokens {
-			fmt.Printf("%s(%s)%s", token.Word, token.Pos, token.After)
+			fmt.Printf("%s(%s)%s\n", token.Word, token.Pos, token.After)
+		}
+	}
+
+	// Output entity mentions
+	fmt.Println("\n----- Entity Mentions -----")
+	for _, sentence := range doc.Sentences {
+		for _, token := range sentence.EntityMentions {
+			fmt.Printf("%s - %s\n", token.Text, token.Ner)
 		}
 	}
 }
@@ -58,7 +68,49 @@ func main() {
 Output:
 
 ```text
-President(NNP) Xi(NN) Jinping(NN) of(IN) Chaina(NNP),(,) on(IN) his(PRP$) first(JJ) state(NN) visit(NN) to(TO) the(DT) United(NNP) States(NNPS),(,) showed(VBD) off(IN) his(PRP$) familiarity(NN) with(IN) American(JJ) history(NN) and(CC) pop(NN) culture(NN) on(IN) Tuesday(NNP) night(NN).(.)
+----- Tokens -----
+President(NNP) 
+Xi(NN) 
+Jinping(NN) 
+of(IN) 
+Chaina(NNP)
+,(,) 
+on(IN) 
+his(PRP$) 
+first(JJ) 
+state(NN) 
+visit(NN) 
+to(TO) 
+the(DT) 
+United(NNP) 
+States(NNPS)
+,(,) 
+showed(VBD) 
+off(IN) 
+his(PRP$) 
+familiarity(NN) 
+with(IN) 
+American(JJ) 
+history(NN) 
+and(CC) 
+pop(NN) 
+culture(NN) 
+on(IN) 
+Tuesday(NNP) 
+night(NN)
+.(.)
+
+----- Entity Mentions -----
+President - TITLE
+Xi Jinping - PERSON
+Chaina - LOCATION
+first - ORDINAL
+United States - COUNTRY
+American - NATIONALITY
+Tuesday - DATE
+night - TIME
+his - PERSON
+his - PERSON
 ```
 
 ### Handle an annotated documents 
