@@ -1,6 +1,7 @@
 package corenlp
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -51,6 +52,28 @@ func TestEntityMention(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	entityMentions := doc.Sentences[0].EntityMentions
+
+	expectText := "Boston Consulting Group"
+	if entityMentions[1].Text != expectText {
+		t.Errorf("Expect get %s, but got %s", expectText, entityMentions[1].Text)
+	}
+
+	expectNer := "ORGANIZATION"
+	if entityMentions[1].Ner != expectNer {
+		t.Errorf("Expect get %s, but got %s", expectNer, entityMentions[1].Ner)
+	}
+}
+
+func TestKBP(t *testing.T) {
+	c := connector.NewHTTPClient(context.Background(), "http://localhost:9000")
+	c.Annotators = []string{"tokenize", "ssplit", "pos", "lemma", "ner", "parse", "coref", "kbp"}
+
+	doc, err := Annotate(c, `Rich Lesser is CEO of Boston Consulting Group`)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%+v\n", doc.Sentences[0].RawParse)
 	entityMentions := doc.Sentences[0].EntityMentions
 
 	expectText := "Boston Consulting Group"
